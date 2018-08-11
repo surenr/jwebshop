@@ -16,18 +16,16 @@ public class CartItem {
     private Product product;
 
     private void calculate() {
+        this.boxQuantity = this.numOfItemsInCategory / product.getNumItemsInPackage();
+        this.itemQuantity = this.numOfItemsInCategory % product.getNumItemsInPackage();
         this.totalBoxPrice = product.getPackagePrice().multiply(new BigDecimal(this.boxQuantity)).setScale(2, RoundingMode.HALF_EVEN);
         this.totalItemPrice = product.getItemPrice().multiply(new BigDecimal(this.itemQuantity)).setScale(2, RoundingMode.HALF_EVEN);
         this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    public CartItem(Product product, int boxQuantity, int itemQuantity) {
-        this.updateCartItem(product, boxQuantity, itemQuantity);
+    public CartItem(Product product, int numberOfProducts) {
+        this.updateCartItem(product,numberOfProducts);
     }
-
-    public void increase(int number) { this.numOfItemsInCategory += number; }
-
-    public void decrease(int number) { this.numOfItemsInCategory -= number; }
 
     public int getNumberOfItemsInCategory() { return this.numOfItemsInCategory; }
 
@@ -43,11 +41,10 @@ public class CartItem {
         return this.itemQuantity;
     }
 
-    public void updateCartItem(Product product, int boxQuantity, int itemQuantity) {
+    public void updateCartItem(Product product,int numberOfProducts) {
         this.product = product;
+        this.numOfItemsInCategory = numberOfProducts;
         this.category = product.getProductName();
-        this.boxQuantity = boxQuantity;
-        this.itemQuantity = itemQuantity;
         this.boxPriceChange = BigDecimal.ZERO;
         this.itemPriceChange = BigDecimal.ZERO;
         this.calculate();
