@@ -2,6 +2,7 @@ package driw.xtechnology.assignment.webshop.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Cart {
@@ -15,6 +16,8 @@ public class Cart {
     }
 
     public void reTotalCart() {
+        this.total = BigDecimal.ZERO;
+        this.totalDiscount = BigDecimal.ZERO;
         this.total = BigDecimal.ZERO;
         this.totalDiscount = BigDecimal.ZERO;
         for(CartItem cartItem: this.cartItems) {
@@ -33,6 +36,12 @@ public class Cart {
                 .get();
     }
 
+    public void addOrUpdate(CartItem item) {
+        this.cartItems.removeIf(listItem -> listItem.category() == item.category());
+        this.cartItems.add(item);
+        this.reTotalCart();
+    }
+
     public List<CartItem> items() {
         return this.cartItems;
     }
@@ -43,5 +52,15 @@ public class Cart {
 
     public BigDecimal totalDiscount() {
         return this.totalDiscount;
+    }
+
+    public void removeItem(CartItem cartItemToRemove) {
+        this.cartItems.removeIf(listItem -> listItem.category() == cartItemToRemove.category());
+        this.reTotalCart();
+    }
+
+    public void empty() {
+        this.cartItems = new ArrayList<>();
+        this.reTotalCart();
     }
 }

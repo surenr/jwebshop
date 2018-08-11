@@ -7,22 +7,29 @@ public class CartItem {
     private String category;
     private int boxQuantity;
     private int itemQuantity;
+    private int numOfItemsInCategory;
     private BigDecimal totalBoxPrice;
     private BigDecimal totalItemPrice;
     private BigDecimal totalPrice;
     private BigDecimal boxPriceChange;
     private BigDecimal itemPriceChange;
+    private Product product;
 
-    public CartItem(Product product, int boxQuantity, int itemQuantity) {
-        this.category = product.getProductName();
-        this.boxQuantity = boxQuantity;
-        this.itemQuantity = itemQuantity;
+    private void calculate() {
         this.totalBoxPrice = product.getPackagePrice().multiply(new BigDecimal(this.boxQuantity)).setScale(2, RoundingMode.HALF_EVEN);
         this.totalItemPrice = product.getItemPrice().multiply(new BigDecimal(this.itemQuantity)).setScale(2, RoundingMode.HALF_EVEN);
         this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
-        this.boxPriceChange = BigDecimal.ZERO;
-        this.itemPriceChange = BigDecimal.ZERO;
     }
+
+    public CartItem(Product product, int boxQuantity, int itemQuantity) {
+        this.updateCartItem(product, boxQuantity, itemQuantity);
+    }
+
+    public void increase(int number) { this.numOfItemsInCategory += number; }
+
+    public void decrease(int number) { this.numOfItemsInCategory -= number; }
+
+    public int getNumberOfItemsInCategory() { return this.numOfItemsInCategory; }
 
     public String category() {
         return this.category;
@@ -34,6 +41,16 @@ public class CartItem {
 
     public int itemQty() {
         return this.itemQuantity;
+    }
+
+    public void updateCartItem(Product product, int boxQuantity, int itemQuantity) {
+        this.product = product;
+        this.category = product.getProductName();
+        this.boxQuantity = boxQuantity;
+        this.itemQuantity = itemQuantity;
+        this.boxPriceChange = BigDecimal.ZERO;
+        this.itemPriceChange = BigDecimal.ZERO;
+        this.calculate();
     }
 
     public BigDecimal totalBoxPrice() {

@@ -37,51 +37,49 @@ public class CartServiceTests {
     @Test
     public void canAddProductToCart() throws InvalidProductException {
         Product product = new Product("Penguinears", new BigDecimal(175), 20);
-        cartService.add(product);
+        cartService.add(product,1);
         Assert.assertEquals(1, cartService.cartItems().size());
-        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).getProductName());
+        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).category());
     }
 
     @Test
     public void canAddMultipleOfSameProductToCart() throws InvalidProductException {
         Product product = new Product("Penguinears", new BigDecimal(175), 20);
         cartService.add(product, 2);
-        Assert.assertEquals(2, cartService.cartItems().size());
-        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).getProductName());
+        Assert.assertEquals(2, cartService.productCount(product));
+        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).category());
     }
 
     @Test(expected = InvalidProductException.class)
     public void addingInvalidProductThrowError() throws InvalidProductException {
         Product product = new Product("", new BigDecimal(0), 0);
-        cartService.add(product);
+        cartService.add(product, 1);
         Assert.fail("InvalidProductException not thrown");
     }
 
     @Test
-    public void canRemoveProductFromCartByIndex() throws InvalidProductException, CartEmptyException {
+    public void canRemoveProductFromCart() throws InvalidProductException, CartEmptyException {
         Assert.assertEquals(0, cartService.cartItems().size());
         Product product = new Product("Penguinears", new BigDecimal(175), 20);
-        cartService.add(product);
-        cartService.remove(0);
+        cartService.add(product,1);
+        cartService.remove(product,1);
         Assert.assertEquals(0, cartService.cartItems().size());
+    }
+
+    @Test
+    public void canRemoveSelectedNumberOfProducts() throws InvalidProductException, CartEmptyException {
+        Assert.assertEquals(0, cartService.cartItems().size());
+        Product product = new Product("Penguinears", new BigDecimal(175), 20);
+        cartService.add(product,5);
+        cartService.remove(product,3);
+        Assert.assertEquals(2, cartService.productCount(product));
     }
 
     @Test(expected = CartEmptyException.class)
     public void removingFromEmptyCartThrowError() throws CartEmptyException {
         Assert.assertEquals(0, cartService.cartItems().size());
-        cartService.remove(0);
-    }
-
-    @Test
-    public void canCategorizeBySimilarProducts() throws InvalidProductException {
-        Product penguinEars = new Product("Penguinears", new BigDecimal(175), 20);
-        Product horseShoes = new Product("Horseshoe", new BigDecimal(825), 5);
-        cartService.add(penguinEars, 25);
-        cartService.add(horseShoes, 15);
-        Assert.assertEquals(40, cartService.cartItems().size());
-        Map<String, List<Product>> categorizedProducts = cartService.categorize();
-        Assert.assertEquals(25, categorizedProducts.get("Penguinears").size());
-        Assert.assertEquals(15, categorizedProducts.get("Horseshoe").size());
+        Product product = new Product("Penguinears", new BigDecimal(175), 20);
+        cartService.remove(product, 0);
     }
 
     @Test
