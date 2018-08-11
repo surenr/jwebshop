@@ -87,6 +87,16 @@ public class CartServiceTests {
     }
 
     @Test
+    public void canRemoveWholeCategory() throws InvalidProductException, CartEmptyException, InvalidProductCountException {
+        Assert.assertEquals(0, cartService.cartItems().size());
+        Product product = new Product("Penguinears", new BigDecimal(175), 20);
+        cartService.add(product,5);
+        Assert.assertEquals(1, cartService.cartItems().size());
+        cartService.removeCategory("Penguinears");
+        Assert.assertEquals(0, cartService.cartItems().size());
+    }
+
+    @Test
     public void canGetBoxAndItemAmounts() throws InvalidProductException, InvalidProductCountException {
         Product penguinEars = new Product("Penguinears", new BigDecimal(175), 20);
         Product horseShoes = new Product("Horseshoe", new BigDecimal(825), 5);

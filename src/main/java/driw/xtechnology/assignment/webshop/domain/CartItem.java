@@ -23,6 +23,19 @@ public class CartItem {
         this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
     }
 
+    public CartItem(CartItem cartItem) {
+        this.category = new String(cartItem.getCategory());
+        this.boxQuantity = cartItem.getBoxQuantity();
+        this.itemQuantity = cartItem.getItemQuantity();
+        this.numOfItemsInCategory = cartItem.getNumOfItemsInCategory();
+        this.totalBoxPrice = cartItem.getTotalBoxPrice().add(BigDecimal.ZERO);
+        this.totalItemPrice = cartItem.getTotalItemPrice().add(BigDecimal.ZERO);
+        this.totalPrice = cartItem.getTotalPrice().add(BigDecimal.ZERO);
+        this.boxPriceChange = cartItem.getBoxPriceChange().add(BigDecimal.ZERO);
+        this.itemPriceChange = cartItem.getItemPriceChange().add(BigDecimal.ZERO);
+        this.product = new Product(cartItem.getProduct());
+    }
+
     public CartItem(Product product, int numberOfProducts) {
         this.updateCartItem(product, numberOfProducts);
     }
@@ -93,5 +106,9 @@ public class CartItem {
 
     public BigDecimal getItemPriceChange() {
         return itemPriceChange;
+    }
+
+    public Product getProduct() {
+        return product;
     }
 }

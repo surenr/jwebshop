@@ -2,6 +2,7 @@ package driw.xtechnology.assignment.webshop.controllers;
 import driw.xtechnology.assignment.webshop.domain.APIResponse;
 import driw.xtechnology.assignment.webshop.domain.Cart;
 import driw.xtechnology.assignment.webshop.domain.Product;
+import driw.xtechnology.assignment.webshop.domain.ProductRequest;
 import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductException;
@@ -18,18 +19,25 @@ public class CartController {
 
     @RequestMapping("/cart")
     public Cart getCart() {
+
         return this.cartService.applyPriceConditions(this.cartService.cart());
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/cart/product")
-    public APIResponse addProductToCart(@RequestBody Product product) throws InvalidProductException, InvalidProductCountException {
-        this.cartService.add(product, 1);
+    public APIResponse addProductToCart(@RequestBody ProductRequest productRequest) throws InvalidProductException, InvalidProductCountException {
+        this.cartService.add(productRequest.getProduct(), productRequest.getNumItems());
         return new APIResponse(HttpStatus.OK, "done");
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/cart/product")
-    public APIResponse removeProductFromCart(@RequestBody Product product) throws CartEmptyException {
-        this.cartService.remove(product, 1);
+    public APIResponse removeProductFromCart(@RequestBody ProductRequest productRequest) throws CartEmptyException {
+        this.cartService.remove(productRequest.getProduct(), productRequest.getNumItems());
+        return new APIResponse(HttpStatus.OK, "done");
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/cart/category/{name}")
+    public APIResponse removeProductFromCart(@PathVariable String name) {
+        this.cartService.removeCategory(name);
         return new APIResponse(HttpStatus.OK, "done");
     }
 }

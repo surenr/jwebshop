@@ -20,6 +20,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new APIResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Required properties of the product is missing."));
     }
 
+    @ExceptionHandler(InvalidProductCountException.class)
+    public ResponseEntity<Object> handleInvlidProductCount(){
+        return buildResponseEntity(new APIResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Required properties of the product is missing."));
+    }
+
     private ResponseEntity<Object> buildResponseEntity(APIResponse apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

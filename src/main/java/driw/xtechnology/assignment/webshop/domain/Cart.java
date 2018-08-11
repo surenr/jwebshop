@@ -15,6 +15,15 @@ public class Cart {
         this.reTotalCart();
     }
 
+    public Cart(Cart cart) {
+        this.cartItems = new ArrayList<>();
+         for(CartItem cartItem: cart.cartItems) {
+             this.cartItems.add(new CartItem(cartItem));
+         }
+        this.total =  cart.total.add(BigDecimal.ZERO);
+        this.totalDiscount = cart.totalDiscount.add(BigDecimal.ZERO);
+    }
+
     public void reTotalCart() {
         this.total = BigDecimal.ZERO;
         this.totalDiscount = BigDecimal.ZERO;

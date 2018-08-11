@@ -66,12 +66,13 @@ public class CartService {
     }
 
     public Cart applyPriceConditions(Cart cart) {
-        for(CartItem item: cart.getCartItems()) {
+        Cart cartWithPriceConditions = new Cart(cart);
+        for(CartItem item: cartWithPriceConditions.getCartItems()) {
             for(IPriceCondition service: this.priceConditionServiceList)
                 item = service.apply(item);
         }
-        cart.reTotalCart();
-        return cart;
+        cartWithPriceConditions.reTotalCart();
+        return cartWithPriceConditions;
     }
 
     public int productCount(Product product) {
@@ -92,4 +93,11 @@ public class CartService {
                 product.getNumItemsInPackage() == 0)
             throw new InvalidProductException();
     }
+
+    public void removeCategory(String categoryName){
+        CartItem cartItemToRemove = this.cart.getCartItems().stream()
+                .filter(item -> item.getCategory().equals(categoryName)).findFirst().orElse(null);
+        if(cartItemToRemove != null) this.cart.removeItem(cartItemToRemove);
+    }
+
 }
