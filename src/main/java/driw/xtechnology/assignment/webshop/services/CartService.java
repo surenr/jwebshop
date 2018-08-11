@@ -26,7 +26,7 @@ public class CartService {
     public void add(Product product, int count) throws InvalidProductException, InvalidProductCountException {
         validateAddProduct(product, count);
         CartItem cartItemToAdd = findCartItemByProductName(product);
-        int numExitingProducts = cartItemToAdd != null ? cartItemToAdd.getNumberOfItemsInCategory() : 0;
+        int numExitingProducts = cartItemToAdd != null ? cartItemToAdd.getNumOfItemsInCategory() : 0;
         int newNumExistingProducts = numExitingProducts + count;
         if(cartItemToAdd != null) {
             cartItemToAdd.updateCartItem(product, newNumExistingProducts);
@@ -41,10 +41,10 @@ public class CartService {
     }
 
     public void remove(Product product, int count) throws CartEmptyException {
-        if(this.cart.items().size() == 0) throw new CartEmptyException();
+        if(this.cart.getCartItems().size() == 0) throw new CartEmptyException();
         CartItem cartItemToRemove = findCartItemByProductName(product);
         if(cartItemToRemove != null) {
-            int numExistingProducts =  cartItemToRemove.getNumberOfItemsInCategory();
+            int numExistingProducts =  cartItemToRemove.getNumOfItemsInCategory();
             int newItemNumberInCategory = numExistingProducts - count;
             if (newItemNumberInCategory < 0) newItemNumberInCategory = 0;
             if (newItemNumberInCategory == 0) {
@@ -62,11 +62,11 @@ public class CartService {
 
 
     public List<CartItem> cartItems() {
-        return this.cart.items();
+        return this.cart.getCartItems();
     }
 
     public Cart applyPriceConditions(Cart cart) {
-        for(CartItem item: cart.items()) {
+        for(CartItem item: cart.getCartItems()) {
             for(IPriceCondition service: this.priceConditionServiceList)
                 item = service.apply(item);
         }
@@ -76,13 +76,13 @@ public class CartService {
 
     public int productCount(Product product) {
         CartItem cartItem = findCartItemByProductName(product);
-        return cartItem == null ? 0 : cartItem.getNumberOfItemsInCategory();
+        return cartItem == null ? 0 : cartItem.getNumOfItemsInCategory();
     }
 
 
     private CartItem findCartItemByProductName(Product product) {
-        return this.cart.items().stream()
-                .filter(item -> item.category().equals(product.getProductName())).findFirst().orElse(null);
+        return this.cart.getCartItems().stream()
+                .filter(item -> item.getCategory().equals(product.getProductName())).findFirst().orElse(null);
     }
 
     private void validateAddProduct(Product product, int count) throws InvalidProductCountException,

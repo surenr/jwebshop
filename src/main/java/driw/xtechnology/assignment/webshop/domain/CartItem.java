@@ -24,24 +24,10 @@ public class CartItem {
     }
 
     public CartItem(Product product, int numberOfProducts) {
-        this.updateCartItem(product,numberOfProducts);
+        this.updateCartItem(product, numberOfProducts);
     }
 
-    public int getNumberOfItemsInCategory() { return this.numOfItemsInCategory; }
-
-    public String category() {
-        return this.category;
-    }
-
-    public int boxQty() {
-        return this.boxQuantity;
-    }
-
-    public int itemQty() {
-        return this.itemQuantity;
-    }
-
-    public void updateCartItem(Product product,int numberOfProducts) {
+    public void updateCartItem(Product product, int numberOfProducts) {
         this.product = product;
         this.numOfItemsInCategory = numberOfProducts;
         this.category = product.getProductName();
@@ -58,14 +44,6 @@ public class CartItem {
         return this.totalItemPrice;
     }
 
-    public BigDecimal boxPriceChanges() { return this.boxPriceChange; }
-
-    public BigDecimal itemPriceChanges() { return this.itemPriceChange; }
-
-    public BigDecimal totalPrice() {
-        return this.totalPrice;
-    }
-
     public void setItemPriceChange(BigDecimal itemPriceChange, PriceChange change) {
         this.itemPriceChange = ((change == PriceChange.INCREMENT) ? itemPriceChange : itemPriceChange.multiply(new BigDecimal(-1))).setScale(2, RoundingMode.HALF_EVEN);
         this.totalItemPrice = this.totalItemPrice.add(this.itemPriceChange).setScale(2, RoundingMode.HALF_EVEN);
@@ -76,5 +54,44 @@ public class CartItem {
         this.boxPriceChange = ((change == PriceChange.INCREMENT) ? boxPriceChange : boxPriceChange.multiply(new BigDecimal(-1))).setScale(2, RoundingMode.HALF_EVEN);
         this.totalBoxPrice = this.totalBoxPrice.add(this.boxPriceChange).setScale(2, RoundingMode.HALF_EVEN);
         this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+
+    public int getBoxQuantity() {
+        return boxQuantity;
+    }
+
+    public int getItemQuantity() {
+        return itemQuantity;
+    }
+
+    public int getNumOfItemsInCategory() {
+        return numOfItemsInCategory;
+    }
+
+    public BigDecimal getTotalBoxPrice() {
+        return totalBoxPrice;
+    }
+
+    public BigDecimal getTotalItemPrice() {
+        return totalItemPrice;
+    }
+
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+
+    public BigDecimal getBoxPriceChange() {
+        return boxPriceChange;
+    }
+
+    public BigDecimal getItemPriceChange() {
+        return itemPriceChange;
     }
 }

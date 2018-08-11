@@ -37,7 +37,7 @@ public class CartServiceTests {
         Product product = new Product("Penguinears", new BigDecimal(175), 20);
         cartService.add(product,1);
         Assert.assertEquals(1, cartService.cartItems().size());
-        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).category());
+        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).getCategory());
     }
 
     @Test(expected = InvalidProductCountException.class)
@@ -51,7 +51,7 @@ public class CartServiceTests {
         Product product = new Product("Penguinears", new BigDecimal(175), 20);
         cartService.add(product, 2);
         Assert.assertEquals(2, cartService.productCount(product));
-        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).category());
+        Assert.assertEquals("Penguinears", cartService.cartItems().get(0).getCategory());
     }
 
     @Test(expected = InvalidProductException.class)
@@ -102,20 +102,20 @@ public class CartServiceTests {
 
         Cart cart = cartService.cart();
 
-        Assert.assertEquals(1, cart.itemByCategory("Penguinears").boxQty());
-        Assert.assertEquals(5, cart.itemByCategory("Penguinears").itemQty());
+        Assert.assertEquals(1, cart.itemByCategory("Penguinears").getBoxQuantity());
+        Assert.assertEquals(5, cart.itemByCategory("Penguinears").getItemQuantity());
 
         Assert.assertEquals(expectedPenguinTotalBoxPrice, cart.itemByCategory("Penguinears").totalBoxPrice());
         Assert.assertEquals(expectedPenguinTotalItemPrice, cart.itemByCategory("Penguinears").totalItemPrice());
-        Assert.assertEquals(expectedPenguinTotalBoxPrice.add(expectedPenguinTotalItemPrice),cart.itemByCategory("Penguinears").totalPrice());
+        Assert.assertEquals(expectedPenguinTotalBoxPrice.add(expectedPenguinTotalItemPrice),cart.itemByCategory("Penguinears").getTotalPrice());
 
-        Assert.assertEquals(3, cart.itemByCategory("Horseshoe").boxQty());
-        Assert.assertEquals(0, cart.itemByCategory("Horseshoe").itemQty());
+        Assert.assertEquals(3, cart.itemByCategory("Horseshoe").getBoxQuantity());
+        Assert.assertEquals(0, cart.itemByCategory("Horseshoe").getItemQuantity());
 
         Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cart.itemByCategory("Horseshoe").totalBoxPrice());
         Assert.assertEquals(expectedHorseShoeTotalItemPrice, cart.itemByCategory("Horseshoe").totalItemPrice());
-        Assert.assertEquals(expectedHorseShoeTotalBoxPrice.add(expectedHorseShoeTotalItemPrice),cart.itemByCategory("Horseshoe").totalPrice());
-        Assert.assertEquals(expectedCartTotal, cart.total());
+        Assert.assertEquals(expectedHorseShoeTotalBoxPrice.add(expectedHorseShoeTotalItemPrice),cart.itemByCategory("Horseshoe").getTotalPrice());
+        Assert.assertEquals(expectedCartTotal, cart.getTotal());
 
         ;
     }
@@ -142,14 +142,14 @@ public class CartServiceTests {
 
         Assert.assertEquals(expectedPenguinEarsTotalBoxPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalBoxPrice());
         Assert.assertEquals(expectedPenguinEarsTotalItemPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalItemPrice());
-        Assert.assertEquals(expectedPenguinEarsTotalPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalPrice());
+        Assert.assertEquals(expectedPenguinEarsTotalPrice, cartWithPriceCondition.itemByCategory("Penguinears").getTotalPrice());
 
         Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalBoxPrice());
         Assert.assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN), cartWithPriceCondition.itemByCategory("Horseshoe").totalItemPrice());
-        Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalPrice());
+        Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").getTotalPrice());
 
-        Assert.assertEquals(cartTotal, cartWithPriceCondition.total());
-        Assert.assertEquals(horseShoeBoxDiscount.multiply(new BigDecimal(-1)), cartWithPriceCondition.totalDiscount());
+        Assert.assertEquals(cartTotal, cartWithPriceCondition.getTotal());
+        Assert.assertEquals(horseShoeBoxDiscount.multiply(new BigDecimal(-1)), cartWithPriceCondition.getTotalDiscount());
 
     }
 
@@ -176,14 +176,14 @@ public class CartServiceTests {
 
         Assert.assertEquals(expectedPenguinEarsTotalBoxPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalBoxPrice());
         Assert.assertEquals(expectedPenguinEarsTotalItemPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalItemPrice());
-        Assert.assertEquals(expectedPenguinEarsTotalPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalPrice());
+        Assert.assertEquals(expectedPenguinEarsTotalPrice, cartWithPriceCondition.itemByCategory("Penguinears").getTotalPrice());
 
         Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalBoxPrice());
         Assert.assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN), cartWithPriceCondition.itemByCategory("Horseshoe").totalItemPrice());
-        Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalPrice());
+        Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").getTotalPrice());
 
-        Assert.assertEquals(cartTotal, cartWithPriceCondition.total());
-        Assert.assertEquals(horseShoeBoxDiscount.multiply(new BigDecimal(-1)), cartWithPriceCondition.totalDiscount());
+        Assert.assertEquals(cartTotal, cartWithPriceCondition.getTotal());
+        Assert.assertEquals(horseShoeBoxDiscount.multiply(new BigDecimal(-1)), cartWithPriceCondition.getTotalDiscount());
 
         cartService.remove(penguinEars, 5);
         cartService.add(horseShoes, 7);
@@ -208,14 +208,14 @@ public class CartServiceTests {
 
         Assert.assertEquals(expectedPenguinEarsTotalBoxPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalBoxPrice());
         Assert.assertEquals(expectedPenguinEarsTotalItemPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalItemPrice());
-        Assert.assertEquals(expectedPenguinEarsTotalPrice, cartWithPriceCondition.itemByCategory("Penguinears").totalPrice());
+        Assert.assertEquals(expectedPenguinEarsTotalPrice, cartWithPriceCondition.itemByCategory("Penguinears").getTotalPrice());
 
         Assert.assertEquals(expectedHorseShoeTotalBoxPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalBoxPrice());
         Assert.assertEquals(expectedHorseShoeTotalItemPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalItemPrice());
-        Assert.assertEquals(expectedHorseShoeTotalPrice, cartWithPriceCondition.itemByCategory("Horseshoe").totalPrice());
+        Assert.assertEquals(expectedHorseShoeTotalPrice, cartWithPriceCondition.itemByCategory("Horseshoe").getTotalPrice());
 
-        Assert.assertEquals(cartTotal, cartWithPriceCondition.total());
-        Assert.assertEquals(horseShoeBoxDiscount.multiply(new BigDecimal(-1)), cartWithPriceCondition.totalDiscount());
+        Assert.assertEquals(cartTotal, cartWithPriceCondition.getTotal());
+        Assert.assertEquals(horseShoeBoxDiscount.multiply(new BigDecimal(-1)), cartWithPriceCondition.getTotalDiscount());
 
     }
 }

@@ -21,41 +21,29 @@ public class Cart {
         this.total = BigDecimal.ZERO;
         this.totalDiscount = BigDecimal.ZERO;
         for(CartItem cartItem: this.cartItems) {
-            this.total = this.total.add(cartItem.totalPrice());
-            if(cartItem.boxPriceChanges().compareTo(BigDecimal.ZERO) < 0)
-                this.totalDiscount = this.totalDiscount.add(cartItem.boxPriceChanges()).setScale(2, RoundingMode.HALF_EVEN);
-            if(cartItem.itemPriceChanges().compareTo(BigDecimal.ZERO) < 0)
-                this.totalDiscount = this.totalDiscount.add(cartItem.itemPriceChanges()).setScale(2, RoundingMode.HALF_EVEN);
+            this.total = this.total.add(cartItem.getTotalPrice());
+            if(cartItem.getBoxPriceChange().compareTo(BigDecimal.ZERO) < 0)
+                this.totalDiscount = this.totalDiscount.add(cartItem.getBoxPriceChange()).setScale(2, RoundingMode.HALF_EVEN);
+            if(cartItem.getItemPriceChange().compareTo(BigDecimal.ZERO) < 0)
+                this.totalDiscount = this.totalDiscount.add(cartItem.getItemPriceChange()).setScale(2, RoundingMode.HALF_EVEN);
         }
     }
 
     public CartItem itemByCategory(String name) {
         return this.cartItems.stream()
-                .filter(cartItem -> cartItem.category().equals(name))
+                .filter(cartItem -> cartItem.getCategory().equals(name))
                 .findFirst()
                 .get();
     }
 
     public void addOrUpdate(CartItem item) {
-        this.cartItems.removeIf(listItem -> listItem.category() == item.category());
+        this.cartItems.removeIf(listItem -> listItem.getCategory() == item.getCategory());
         this.cartItems.add(item);
         this.reTotalCart();
     }
 
-    public List<CartItem> items() {
-        return this.cartItems;
-    }
-
-    public BigDecimal total() {
-        return this.total;
-    }
-
-    public BigDecimal totalDiscount() {
-        return this.totalDiscount;
-    }
-
     public void removeItem(CartItem cartItemToRemove) {
-        this.cartItems.removeIf(listItem -> listItem.category() == cartItemToRemove.category());
+        this.cartItems.removeIf(listItem -> listItem.getCategory() == cartItemToRemove.getCategory());
         this.reTotalCart();
     }
 
@@ -63,4 +51,18 @@ public class Cart {
         this.cartItems = new ArrayList<>();
         this.reTotalCart();
     }
+
+    public List<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public BigDecimal getTotalDiscount() {
+        return totalDiscount;
+    }
+
 }
