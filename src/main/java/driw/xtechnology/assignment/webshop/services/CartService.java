@@ -4,6 +4,7 @@ import driw.xtechnology.assignment.webshop.domain.Cart;
 import driw.xtechnology.assignment.webshop.domain.CartItem;
 import driw.xtechnology.assignment.webshop.domain.Product;
 import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
+import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,68 +13,56 @@ import java.util.*;
 
 @Service
 public class CartService {
-    private List<Product> cartItems = new ArrayList<>();
 
     @Autowired
     private List<IPriceCondition> priceConditionServiceList;
 
-    public void add(Product product) throws InvalidProductException {
-        if(product.getProductName().isEmpty() || product.getPackagePrice().equals(0) || product.getNumItemsInPackage() == 0)
-            throw new InvalidProductException();
-        this.cartItems.add(product);
+    private Cart cart;
+
+    public CartService() {
+        this.cart = new Cart(new ArrayList<>());
     }
 
-    public void add(Product product, int count) throws InvalidProductException {
-        for(int i=0; i<count; i++)
-            this.add(product);
+    public void add(Product product, int count) throws InvalidProductException, InvalidProductCountException {
+        validateAddProduct(product, count);
+        CartItem cartItemToAdd = findCartItemByProductName(product);
+        int numExitingProducts = cartItemToAdd != null ? cartItemToAdd.getNumberOfItemsInCategory() : 0;
+        int newNumExistingProducts = numExitingProducts + count;
+        if(cartItemToAdd != null) {
+            cartItemToAdd.updateCartItem(product, newNumExistingProducts);
+        } else {
+            cartItemToAdd = new CartItem(product, newNumExistingProducts);
+        }
+        this.cart.addOrUpdate(cartItemToAdd);
     }
-
 
     public void empty() {
-        this.cartItems = new ArrayList<>();
+        this.cart.empty();
     }
 
-    public void remove(int  index) throws CartEmptyException {
-        if(this.cartItems.size() == 0) throw new CartEmptyException();
-        this.cartItems.remove(index);
+    public void remove(Product product, int count) throws CartEmptyException {
+        if(this.cart.items().size() == 0) throw new CartEmptyException();
+        CartItem cartItemToRemove = findCartItemByProductName(product);
+        if(cartItemToRemove != null) {
+            int numExistingProducts =  cartItemToRemove.getNumberOfItemsInCategory();
+            int newItemNumberInCategory = numExistingProducts - count;
+            if (newItemNumberInCategory < 0) newItemNumberInCategory = 0;
+            if (newItemNumberInCategory == 0) {
+                this.cart.removeItem(cartItemToRemove);
+            } else {
+                cartItemToRemove.updateCartItem(product,newItemNumberInCategory);
+                this.cart.addOrUpdate(cartItemToRemove);
+            }
+        }
     }
 
     public Cart cart() {
-        return new Cart(this.calculatePriceByProductCategory());
+        return this.cart;
     }
 
 
-    public List<Product> cartItems() {
-        return this.cartItems;
-    }
-
-    public Map<String, List<Product>> categorize() {
-        Map<String, List<Product>> tempMap = new HashMap<>();
-        for(Product item : this.cartItems) {
-            if(tempMap.get(item.getProductName()) == null) {
-                List<Product> itemList= new ArrayList<>();
-                itemList.add(item);
-                tempMap.put(item.getProductName(), itemList);
-                continue;
-            }
-            tempMap.get(item.getProductName()).add(item);
-        }
-       return tempMap;
-    }
-
-    public List<CartItem> calculatePriceByProductCategory() {
-        Map<String, List<Product>> categoryMap = this.categorize();
-        List<CartItem> cartItemList = new ArrayList<>();
-        Iterator<Map.Entry<String, List<Product>>> iterator = categoryMap.entrySet().iterator();
-        while(iterator.hasNext()) {
-            Map.Entry<String, List<Product>> productCategory = iterator.next();
-            Product productDetail = productCategory.getValue().get(0);
-            int boxCount = productCategory.getValue().size() / productDetail.getNumItemsInPackage();
-            int itemCount =productCategory.getValue().size() % productDetail.getNumItemsInPackage();
-            CartItem tempCartItem = new CartItem(productDetail, boxCount, itemCount);
-            cartItemList.add(tempCartItem);
-        }
-        return cartItemList;
+    public List<CartItem> cartItems() {
+        return this.cart.items();
     }
 
     public Cart applyPriceConditions(Cart cart) {
@@ -83,5 +72,24 @@ public class CartService {
         }
         cart.reTotalCart();
         return cart;
+    }
+
+    public int productCount(Product product) {
+        CartItem cartItem = findCartItemByProductName(product);
+        return cartItem == null ? 0 : cartItem.getNumberOfItemsInCategory();
+    }
+
+
+    private CartItem findCartItemByProductName(Product product) {
+        return this.cart.items().stream()
+                .filter(item -> item.category().equals(product.getProductName())).findFirst().orElse(null);
+    }
+
+    private void validateAddProduct(Product product, int count) throws InvalidProductCountException,
+            InvalidProductException {
+        if(count == 0) throw new InvalidProductCountException();
+        if(product.getProductName().isEmpty() || product.getPackagePrice().equals(0) ||
+                product.getNumItemsInPackage() == 0)
+            throw new InvalidProductException();
     }
 }
