@@ -17,6 +17,10 @@ public class ProductService {
     private List<IPriceCondition> priceConditionServiceList;
 
     public ProductService() {
+        this.populateInventory();
+    }
+
+    public void populateInventory() {
         inventory = new ArrayList<>();
         inventory.add(new InventoryItem(new Product(
                 "PenguinEars",
@@ -24,7 +28,7 @@ public class ProductService {
                 20,
                 "https://ae01.alicdn.com/kf/HTB1G4DbKFXXXXaKXXXXq6xXFXXX6/Cute-Cartoon-Plush-Animal-Penguin-Fuzzy-Warm-Beanie-Hat-Winter-Adult-Women-Men-s-Children-Kids.jpg",
                 "Penguin Ears",
-                 "They are great to keep you warm"), 50));
+                "They are great to keep you warm"), 50));
 
         inventory.add(new InventoryItem(new Product(
                 "HorseShoes",
@@ -51,7 +55,7 @@ public class ProductService {
                 "Feel free to gift away"), 50));
     }
 
-    // TODO: Write a unit test to cover this
+
     public List<InventoryItem> applyPriceConditions(List<InventoryItem> inventory) {
         List<InventoryItem> clone = new ArrayList<>();
         for(InventoryItem item: inventory)
@@ -95,5 +99,9 @@ public class ProductService {
             inventory.add(inventoryItemToRemove);
 
         }
+    }
+
+    public void emptyInventory() {
+        inventory = new ArrayList<>();
     }
 }
