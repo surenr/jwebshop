@@ -5,7 +5,9 @@
       <div class="card-body">
         <h4 class="card-title">{{ name }}</h4>
         <div class="cart-text">{{ description }}</div>
-        <div class="card-text"><strong>{{ price | dollars }}</strong></div>
+        <div class="cart-text">{{ numBoxes }} Boxes or {{ numItems }} Items avilable</div>
+        <div class="card-text"><strong> Item Price: {{ itemSellingPrice | dollars }}</strong></div>
+        <div class="card-text"><strong> Box Price: {{ boxSellingPrice | dollars }}</strong></div>
         <div class="row justify-content-end">
           <div class="col-md-6">
             <button class="btn btn-success" @click="addToCart(category, itemsInBox)">Buy a Box</button>
@@ -24,7 +26,7 @@ import { dollars } from './filters';
 
 export default {
   name: 'item',
-  props: ['invId', 'name', 'image', 'price', 'description', 'itemsInBox', 'category'],
+  props: ['name','category','image','description','itemsInBox', 'itemSellingPrice','numBoxes','numItems','boxSellingPrice'],
   filters: {
     dollars,
   },

@@ -26,10 +26,10 @@ public class CartService {
     public void add(Product product, int count) throws InvalidProductException, InvalidProductCountException {
         validateAddProduct(product, count);
         CartItem cartItemToAdd = findCartItemByProductName(product);
-        int numExitingProducts = cartItemToAdd != null ? cartItemToAdd.getNumOfItemsInCategory() : 0;
+        int numExitingProducts = cartItemToAdd != null ? cartItemToAdd.getNumOfProductsInCategory() : 0;
         int newNumExistingProducts = numExitingProducts + count;
         if(cartItemToAdd != null) {
-            cartItemToAdd.updateCartItem(product, newNumExistingProducts);
+            cartItemToAdd.updateItem(product, newNumExistingProducts);
         } else {
             cartItemToAdd = new CartItem(product, newNumExistingProducts);
         }
@@ -44,13 +44,13 @@ public class CartService {
         if(this.cart.getCartItems().size() == 0) throw new CartEmptyException();
         CartItem cartItemToRemove = findCartItemByProductName(product);
         if(cartItemToRemove != null) {
-            int numExistingProducts =  cartItemToRemove.getNumOfItemsInCategory();
+            int numExistingProducts =  cartItemToRemove.getNumOfProductsInCategory();
             int newItemNumberInCategory = numExistingProducts - count;
             if (newItemNumberInCategory < 0) newItemNumberInCategory = 0;
             if (newItemNumberInCategory == 0) {
                 this.cart.removeItem(cartItemToRemove);
             } else {
-                cartItemToRemove.updateCartItem(product,newItemNumberInCategory);
+                cartItemToRemove.updateItem(product,newItemNumberInCategory);
                 this.cart.addOrUpdate(cartItemToRemove);
             }
         }
@@ -69,7 +69,7 @@ public class CartService {
         Cart cartWithPriceConditions = new Cart(cart);
         for(CartItem item: cartWithPriceConditions.getCartItems()) {
             for(IPriceCondition service: this.priceConditionServiceList)
-                item = service.apply(item);
+                item = (CartItem)service.apply(item); // NB: Safe to cast since we already kow the time of item
         }
         cartWithPriceConditions.reTotalCart();
         return cartWithPriceConditions;
@@ -77,7 +77,7 @@ public class CartService {
 
     public int productCount(Product product) {
         CartItem cartItem = findCartItemByProductName(product);
-        return cartItem == null ? 0 : cartItem.getNumOfItemsInCategory();
+        return cartItem == null ? 0 : cartItem.getNumOfProductsInCategory();
     }
 
 

@@ -11,15 +11,17 @@
 
     <div class="row">
       <Item
-        v-for="item in forSale"
-        :key="item.invId"
-        :invId="item.invId"
-        :name="item.name"
-        :category="item.productName"
-        :image="item.image"
-        :description="item.description"
-        :itemsInBox="item.numItemsInPackage"
-        :price="item.price" />
+        v-for="item in inventory"
+        :key="item.category"
+        :name="item.product.displayName"
+        :category="item.category"
+        :image="item.product.imgUrl"
+        :description="item.product.description"
+        :itemsInBox="item.product.numItemsInPackage"
+        :itemSellingPrice="item.individualItemPrice"
+        :numBoxes="item.boxQuantity"
+        :numItems="item.numOfProductsInCategory"
+        :boxSellingPrice="item.product.packagePrice" />
     </div>
   </div>
 </template>
@@ -33,7 +35,7 @@ import safePromise from './utils/safe.js'
 export default {
   name: 'app',
   computed: {
-    forSale() { return this.$store.getters.forSale; },
+    inventory() { return this.$store.getters.inventory; },
   },
   components: {
     Item,
@@ -41,6 +43,7 @@ export default {
   },
   created() {
     console.log('Testing fetch for api communication');
+    this.$store.dispatch('updateInventory');
     this.$store.dispatch('updateCart');
   }
 };

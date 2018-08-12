@@ -126,8 +126,6 @@ public class CartServiceTests {
         Assert.assertEquals(expectedHorseShoeTotalItemPrice, cart.itemByCategory("Horseshoe").totalItemPrice());
         Assert.assertEquals(expectedHorseShoeTotalBoxPrice.add(expectedHorseShoeTotalItemPrice),cart.itemByCategory("Horseshoe").getTotalPrice());
         Assert.assertEquals(expectedCartTotal, cart.getTotal());
-
-        ;
     }
 
     @Test

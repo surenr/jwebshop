@@ -3,31 +3,19 @@ package driw.xtechnology.assignment.webshop.domain;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class CartItem {
-    private String category;
-    private int boxQuantity;
-    private int itemQuantity;
-    private int numOfItemsInCategory;
+public class CartItem extends InventoryItem{
+
     private BigDecimal totalBoxPrice;
     private BigDecimal totalItemPrice;
     private BigDecimal totalPrice;
     private BigDecimal boxPriceChange;
     private BigDecimal itemPriceChange;
-    private Product product;
-
-    private void calculate() {
-        this.boxQuantity = this.numOfItemsInCategory / product.getNumItemsInPackage();
-        this.itemQuantity = this.numOfItemsInCategory % product.getNumItemsInPackage();
-        this.totalBoxPrice = product.getPackagePrice().multiply(new BigDecimal(this.boxQuantity)).setScale(2, RoundingMode.HALF_EVEN);
-        this.totalItemPrice = product.getItemPrice().multiply(new BigDecimal(this.itemQuantity)).setScale(2, RoundingMode.HALF_EVEN);
-        this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
-    }
 
     public CartItem(CartItem cartItem) {
         this.category = new String(cartItem.getCategory());
         this.boxQuantity = cartItem.getBoxQuantity();
         this.itemQuantity = cartItem.getItemQuantity();
-        this.numOfItemsInCategory = cartItem.getNumOfItemsInCategory();
+        this.numOfProductsInCategory = cartItem.getNumOfProductsInCategory();
         this.totalBoxPrice = cartItem.getTotalBoxPrice().add(BigDecimal.ZERO);
         this.totalItemPrice = cartItem.getTotalItemPrice().add(BigDecimal.ZERO);
         this.totalPrice = cartItem.getTotalPrice().add(BigDecimal.ZERO);
@@ -37,16 +25,15 @@ public class CartItem {
     }
 
     public CartItem(Product product, int numberOfProducts) {
-        this.updateCartItem(product, numberOfProducts);
+        this.updateItem(product, numberOfProducts);
     }
 
-    public void updateCartItem(Product product, int numberOfProducts) {
-        this.product = product;
-        this.numOfItemsInCategory = numberOfProducts;
-        this.category = product.getProductName();
-        this.boxPriceChange = BigDecimal.ZERO;
-        this.itemPriceChange = BigDecimal.ZERO;
-        this.calculate();
+    @Override
+    protected void calculate() {
+        super.calculate();
+        this.totalBoxPrice = product.getPackagePrice().multiply(new BigDecimal(this.boxQuantity)).setScale(2, RoundingMode.HALF_EVEN);
+        this.totalItemPrice = product.getItemPrice().multiply(new BigDecimal(this.itemQuantity)).setScale(2, RoundingMode.HALF_EVEN);
+        this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
     }
 
     public BigDecimal totalBoxPrice() {
@@ -67,23 +54,6 @@ public class CartItem {
         this.boxPriceChange = ((change == PriceChange.INCREMENT) ? boxPriceChange : boxPriceChange.multiply(new BigDecimal(-1))).setScale(2, RoundingMode.HALF_EVEN);
         this.totalBoxPrice = this.totalBoxPrice.add(this.boxPriceChange).setScale(2, RoundingMode.HALF_EVEN);
         this.totalPrice = this.totalBoxPrice.add(this.totalItemPrice).setScale(2, RoundingMode.HALF_EVEN);
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-
-    public int getBoxQuantity() {
-        return boxQuantity;
-    }
-
-    public int getItemQuantity() {
-        return itemQuantity;
-    }
-
-    public int getNumOfItemsInCategory() {
-        return numOfItemsInCategory;
     }
 
     public BigDecimal getTotalBoxPrice() {
@@ -108,7 +78,10 @@ public class CartItem {
         return itemPriceChange;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-}
+    @Override
+    public void updateItem(Product product, int numberOfProducts) {
+        super.updateItem(product, numberOfProducts);
+        this.boxPriceChange = BigDecimal.ZERO;
+        this.itemPriceChange = BigDecimal.ZERO;
+        this.calculate();
+    }}

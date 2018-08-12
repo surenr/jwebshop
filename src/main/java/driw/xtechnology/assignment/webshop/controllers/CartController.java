@@ -6,7 +6,9 @@ import driw.xtechnology.assignment.webshop.domain.ProductRequest;
 import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductException;
+import driw.xtechnology.assignment.webshop.exceptions.NoProductsAvailableInInventoryException;
 import driw.xtechnology.assignment.webshop.services.CartService;
+import driw.xtechnology.assignment.webshop.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,8 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+    @Autowired
+    private ProductService productService;
 
     @RequestMapping("/cart")
     public Cart getCart() {
@@ -24,7 +28,8 @@ public class CartController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/cart/product")
-    public APIResponse addProductToCart(@RequestBody ProductRequest productRequest) throws InvalidProductException, InvalidProductCountException {
+    public APIResponse addProductToCart(@RequestBody ProductRequest productRequest) throws InvalidProductException, InvalidProductCountException, NoProductsAvailableInInventoryException {
+        this.productService.remove(productRequest.getProduct(), productRequest.getNumItems());
         this.cartService.add(productRequest.getProduct(), productRequest.getNumItems());
         return new APIResponse(HttpStatus.OK, "done");
     }
@@ -32,6 +37,7 @@ public class CartController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/cart/product")
     public APIResponse removeProductFromCart(@RequestBody ProductRequest productRequest) throws CartEmptyException {
         this.cartService.remove(productRequest.getProduct(), productRequest.getNumItems());
+        this.productService.add(productRequest.getProduct(), productRequest.getNumItems());
         return new APIResponse(HttpStatus.OK, "done");
     }
 

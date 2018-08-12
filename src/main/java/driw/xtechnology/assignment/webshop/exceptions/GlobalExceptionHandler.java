@@ -25,6 +25,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new APIResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Required properties of the product is missing."));
     }
 
+    @ExceptionHandler(NoProductsAvailableInInventoryException.class)
+    public ResponseEntity<Object> handleOutOfStockError() throws Exception {
+        return buildResponseEntity(new APIResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Not enough items found in the inventory"));
+        //throw new Exception("Not enough items found in the inventory");
+    }
+
     private ResponseEntity<Object> buildResponseEntity(APIResponse apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
