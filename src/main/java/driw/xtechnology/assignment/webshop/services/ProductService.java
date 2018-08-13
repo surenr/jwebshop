@@ -14,12 +14,65 @@ import java.util.List;
 @Service
 @SessionScope
 public class ProductService {
-    private List<InventoryItem> inventory;
     @Autowired
     private List<IPriceCondition> priceConditionServiceList;
 
+    private List<InventoryItem> inventory;
+
     public ProductService() {
         this.populateInventory();
+    }
+
+    public List<InventoryItem> applyPriceConditions(List<InventoryItem> inventory) {
+        List<InventoryItem> clone = new ArrayList<>();
+        for(InventoryItem item: inventory) {
+            InventoryItem forPriceConditions = new InventoryItem(item);
+            for(IPriceCondition service: this.priceConditionServiceList) {
+                forPriceConditions = service.apply(forPriceConditions);
+            }
+            clone.add(forPriceConditions);
+        }
+        return clone;
+    }
+
+    public List<InventoryItem> getInventory() {
+        return inventory;
+    }
+
+    public void add(Product product, int count) { // NB: Increase the product quantity if the product exists.
+        InventoryItem inventoryItemToAdd = inventory.stream().filter(item -> item.getCategory()
+                .equals(product.getProductName())).findFirst().orElse(null);
+        int numExitingProducts = inventoryItemToAdd != null ? inventoryItemToAdd.getNumOfProductsInCategory() : 0;
+        int newNumExistingProducts = numExitingProducts + count;
+        if(inventoryItemToAdd != null) {
+            inventoryItemToAdd.updateItem(inventoryItemToAdd.getProduct(), newNumExistingProducts);
+            inventory.removeIf(item -> item.getCategory().equals(product.getProductName()));
+            inventory.add(inventoryItemToAdd);
+        }
+    }
+
+    public void remove(Product product, int numItems) throws NoProductsAvailableInInventoryException {
+        if(this.inventory.size() == 0) throw new NoProductsAvailableInInventoryException();
+        InventoryItem inventoryItemToRemove = inventory.stream().filter(item -> item.getCategory()
+                .equals(product.getProductName())).findFirst().orElse(null);
+
+        if(inventoryItemToRemove != null) {
+            int numExistingProducts =  inventoryItemToRemove.getNumOfProductsInCategory();
+            int newItemNumberInCategory = numExistingProducts - numItems;
+            if (newItemNumberInCategory < 0) throw new NoProductsAvailableInInventoryException();
+            inventoryItemToRemove.updateItem(inventoryItemToRemove.getProduct(),newItemNumberInCategory);
+            inventory.removeIf(item -> item.getCategory().equals(product.getProductName()));
+            inventory.add(inventoryItemToRemove);
+
+        }
+    }
+
+    public List<InventoryItem> getPriceAppliedInventory() {
+        return applyPriceConditions(this.getInventory());
+    }
+
+    public void emptyInventory() {
+        inventory = new ArrayList<>();
     }
 
     public void populateInventory() {
@@ -55,61 +108,5 @@ public class ProductService {
                 "http://www.houseofgifts.lk/media/catalog/product/cache/1/thumbnail/480x/17f82f742ffe127f42dca9de82fb58b1/i/m/img_7164.jpg",
                 "Decorated Elephant",
                 "Feel free to gift away"), 50));
-    }
-
-
-    public List<InventoryItem> applyPriceConditions(List<InventoryItem> inventory) {
-        List<InventoryItem> clone = new ArrayList<>();
-        for(InventoryItem item: inventory) {
-            clone.add(new InventoryItem(item));
-        }
-
-        for(InventoryItem item: clone) {
-            for(IPriceCondition service: this.priceConditionServiceList) {
-                item = service.apply(item);
-            }
-        }
-        return clone;
-    }
-
-    // TODO: Write a unit test to cover this
-    public List<InventoryItem> getInventory() {
-        return inventory;
-    }
-
-    public void add(Product product, int count) {
-        InventoryItem inventoryItemToAdd = inventory.stream().filter(item -> item.getCategory()
-                .equals(product.getProductName())).findFirst().orElse(null);
-        int numExitingProducts = inventoryItemToAdd != null ? inventoryItemToAdd.getNumOfProductsInCategory() : 0;
-        int newNumExistingProducts = numExitingProducts + count;
-        if(inventoryItemToAdd != null) {
-            inventoryItemToAdd.updateItem(inventoryItemToAdd.getProduct(), newNumExistingProducts);
-            inventory.removeIf(item -> item.getCategory().equals(product.getProductName()));
-            inventory.add(inventoryItemToAdd);
-        }
-    }
-
-    public void remove(Product product, int numItems) throws NoProductsAvailableInInventoryException {
-        if(this.inventory.size() == 0) throw new NoProductsAvailableInInventoryException();
-        InventoryItem inventoryItemToRemove = inventory.stream().filter(item -> item.getCategory()
-                .equals(product.getProductName())).findFirst().orElse(null);
-
-        if(inventoryItemToRemove != null) {
-            int numExistingProducts =  inventoryItemToRemove.getNumOfProductsInCategory();
-            int newItemNumberInCategory = numExistingProducts - numItems;
-            if (newItemNumberInCategory < 0) throw new NoProductsAvailableInInventoryException();
-            inventoryItemToRemove.updateItem(inventoryItemToRemove.getProduct(),newItemNumberInCategory);
-            inventory.removeIf(item -> item.getCategory().equals(product.getProductName()));
-            inventory.add(inventoryItemToRemove);
-
-        }
-    }
-
-    public List<InventoryItem> getPriceAppliedInventory() {
-        return applyPriceConditions(this.getInventory());
-    }
-
-    public void emptyInventory() {
-        inventory = new ArrayList<>();
     }
 }
