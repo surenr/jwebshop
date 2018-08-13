@@ -112,4 +112,10 @@ public class CartService {
         if(cartItemToRemove != null) this.dataService.getCart().removeItem(cartItemToRemove);
     }
 
+    public CartItem findCartItemByCategory(String categoryName) {
+        return this.dataService.getCart().getCartItems().stream()
+                .filter(item -> item.getCategory().equals(categoryName)).findFirst().orElse(null);
+    }
+
+
 }

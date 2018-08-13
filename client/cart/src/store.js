@@ -128,6 +128,7 @@ export default new Vuex.Store({
       .then(respons => {
         console.log(respons.data);
         dispatch('updateCart');
+        dispatch('updateInventory');
       }).catch( error => {
         console.log(error);
         alert(error.response.data.message);

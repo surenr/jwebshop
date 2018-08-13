@@ -1,6 +1,7 @@
 package driw.xtechnology.assignment.webshop.controllers;
 import driw.xtechnology.assignment.webshop.domain.APIResponse;
 import driw.xtechnology.assignment.webshop.domain.Cart;
+import driw.xtechnology.assignment.webshop.domain.CartItem;
 import driw.xtechnology.assignment.webshop.domain.ProductRequest;
 import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
@@ -46,7 +47,8 @@ public class CartController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/cart/category/{name}")
     public APIResponse removeProductFromCart(@PathVariable String name) {
-
+        CartItem itemToAd = this.cartService.findCartItemByCategory(name);
+        this.productService.add(itemToAd.getProduct(), itemToAd.getNumOfProductsInCategory());
         this.cartService.removeCategory(name);
         return new APIResponse(HttpStatus.OK, "done");
     }
