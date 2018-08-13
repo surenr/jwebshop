@@ -1,16 +1,18 @@
 package driw.xtechnology.assignment.webshop.services;
 
-import driw.xtechnology.assignment.webshop.domain.CartItem;
 import driw.xtechnology.assignment.webshop.domain.InventoryItem;
 import driw.xtechnology.assignment.webshop.domain.Product;
 import driw.xtechnology.assignment.webshop.exceptions.NoProductsAvailableInInventoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.SessionScope;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@SessionScope
 public class ProductService {
     private List<InventoryItem> inventory;
     @Autowired
@@ -58,12 +60,14 @@ public class ProductService {
 
     public List<InventoryItem> applyPriceConditions(List<InventoryItem> inventory) {
         List<InventoryItem> clone = new ArrayList<>();
-        for(InventoryItem item: inventory)
+        for(InventoryItem item: inventory) {
             clone.add(new InventoryItem(item));
+        }
 
         for(InventoryItem item: clone) {
-            for(IPriceCondition service: this.priceConditionServiceList)
+            for(IPriceCondition service: this.priceConditionServiceList) {
                 item = service.apply(item);
+            }
         }
         return clone;
     }
@@ -99,6 +103,10 @@ public class ProductService {
             inventory.add(inventoryItemToRemove);
 
         }
+    }
+
+    public List<InventoryItem> getPriceAppliedInventory() {
+        return applyPriceConditions(this.getInventory());
     }
 
     public void emptyInventory() {

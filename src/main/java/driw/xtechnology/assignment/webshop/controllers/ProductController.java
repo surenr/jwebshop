@@ -28,6 +28,6 @@ public class ProductController {
 
     @RequestMapping("/products")
     public List<InventoryItem> getProducts() {
-       return productService.applyPriceConditions(productService.getInventory());
+       return productService.getPriceAppliedInventory();
     }
 }

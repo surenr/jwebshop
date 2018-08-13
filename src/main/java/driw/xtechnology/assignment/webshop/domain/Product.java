@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class Product {
-    String productName;
-    BigDecimal packagePrice;
-    int numItemsInPackage;
-    String imgUrl;
-    String displayName;
-    String description;
+    private String productName;
+    private BigDecimal packagePrice;
+    private int numItemsInPackage;
+    private String imgUrl;
+    private String displayName;
+    private String description;
 
     public Product() {
 

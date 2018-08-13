@@ -1,5 +1,4 @@
 package driw.xtechnology.assignment.webshop.services;
-
 import driw.xtechnology.assignment.webshop.domain.Cart;
 import driw.xtechnology.assignment.webshop.domain.CartItem;
 import driw.xtechnology.assignment.webshop.domain.Product;
@@ -8,10 +7,12 @@ import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountExcepti
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.*;
 
 @Service
+@SessionScope
 public class CartService {
 
     @Autowired

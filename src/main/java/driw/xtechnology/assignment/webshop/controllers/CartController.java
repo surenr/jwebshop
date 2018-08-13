@@ -1,7 +1,6 @@
 package driw.xtechnology.assignment.webshop.controllers;
 import driw.xtechnology.assignment.webshop.domain.APIResponse;
 import driw.xtechnology.assignment.webshop.domain.Cart;
-import driw.xtechnology.assignment.webshop.domain.Product;
 import driw.xtechnology.assignment.webshop.domain.ProductRequest;
 import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
