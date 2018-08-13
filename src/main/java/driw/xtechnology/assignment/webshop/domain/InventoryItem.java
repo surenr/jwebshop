@@ -21,6 +21,7 @@ public class InventoryItem {
     }
 
     public InventoryItem(InventoryItem inventoryItem) {
+
         this.category = new String(inventoryItem.getCategory());
         this.boxQuantity = inventoryItem.getBoxQuantity();
         this.itemQuantity = inventoryItem.getItemQuantity();
@@ -61,6 +62,7 @@ public class InventoryItem {
     }
 
     public void updateItem(Product product, int numberOfProducts) {
+
         this.product = product;
         this.numOfProductsInCategory = numberOfProducts;
         this.category = product.getProductName();
@@ -68,6 +70,7 @@ public class InventoryItem {
     }
 
     protected void calculate() {
+
         this.boxQuantity = this.numOfProductsInCategory / product.getNumItemsInPackage();
         this.itemQuantity = this.numOfProductsInCategory % product.getNumItemsInPackage();
     }

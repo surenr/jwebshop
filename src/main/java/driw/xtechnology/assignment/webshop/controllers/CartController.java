@@ -12,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+
 @RestController
 public class CartController {
 
     @Autowired
     private CartService cartService;
+
     @Autowired
     private ProductService productService;
 
@@ -28,6 +31,7 @@ public class CartController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/cart/product")
     public APIResponse addProductToCart(@RequestBody ProductRequest productRequest) throws InvalidProductException, InvalidProductCountException, NoProductsAvailableInInventoryException {
+
         this.productService.remove(productRequest.getProduct(), productRequest.getNumItems());
         this.cartService.add(productRequest.getProduct(), productRequest.getNumItems());
         return new APIResponse(HttpStatus.OK, "done");
@@ -35,6 +39,7 @@ public class CartController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/cart/product")
     public APIResponse removeProductFromCart(@RequestBody ProductRequest productRequest) throws CartEmptyException {
+
         this.cartService.remove(productRequest.getProduct(), productRequest.getNumItems());
         this.productService.add(productRequest.getProduct(), productRequest.getNumItems());
         return new APIResponse(HttpStatus.OK, "done");
@@ -42,6 +47,7 @@ public class CartController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/cart/category/{name}")
     public APIResponse removeProductFromCart(@PathVariable String name) {
+
         this.cartService.removeCategory(name);
         return new APIResponse(HttpStatus.OK, "done");
     }

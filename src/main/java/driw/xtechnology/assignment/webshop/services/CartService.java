@@ -6,7 +6,10 @@ import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.*;
@@ -25,15 +28,20 @@ public class CartService {
     }
 
     public void add(Product product, int count) throws InvalidProductException, InvalidProductCountException {
+
         validateAddProduct(product, count);
+
         CartItem cartItemToAdd = findCartItemByProductName(product);
+
         int numExitingProducts = cartItemToAdd != null ? cartItemToAdd.getNumOfProductsInCategory() : 0;
         int newNumExistingProducts = numExitingProducts + count;
+
         if(cartItemToAdd != null) {
             cartItemToAdd.updateItem(product, newNumExistingProducts);
         } else {
             cartItemToAdd = new CartItem(product, newNumExistingProducts);
         }
+
         this.cart.addOrUpdate(cartItemToAdd);
     }
 
@@ -42,12 +50,18 @@ public class CartService {
     }
 
     public void remove(Product product, int count) throws CartEmptyException {
+
         if(this.cart.getCartItems().size() == 0) throw new CartEmptyException();
+
         CartItem cartItemToRemove = findCartItemByProductName(product);
+
         if(cartItemToRemove != null) {
+
             int numExistingProducts =  cartItemToRemove.getNumOfProductsInCategory();
             int newItemNumberInCategory = numExistingProducts - count;
+
             if (newItemNumberInCategory < 0) newItemNumberInCategory = 0;
+
             if (newItemNumberInCategory == 0) {
                 this.cart.removeItem(cartItemToRemove);
             } else {
@@ -67,38 +81,45 @@ public class CartService {
     }
 
     public Cart applyPriceConditions(Cart cart) {
+
         Cart cartWithPriceConditions = new Cart(cart);
+
         for(CartItem item: cartWithPriceConditions.getCartItems()) {
             for(IPriceCondition service: this.priceConditionServiceList)
                 item = (CartItem)service.apply(item); // NB: Safe to cast since we already kow the time of item
         }
+
         cartWithPriceConditions.reTotalCart();
         return cartWithPriceConditions;
     }
 
     public int productCount(Product product) {
+
         CartItem cartItem = findCartItemByProductName(product);
         return cartItem == null ? 0 : cartItem.getNumOfProductsInCategory();
     }
 
 
     private CartItem findCartItemByProductName(Product product) {
+
         return this.cart.getCartItems().stream()
                 .filter(item -> item.getCategory().equals(product.getProductName())).findFirst().orElse(null);
     }
 
-    private void validateAddProduct(Product product, int count) throws InvalidProductCountException,
-            InvalidProductException {
+    private void validateAddProduct(Product product, int count) throws InvalidProductCountException, InvalidProductException {
+
         if(count == 0) throw new InvalidProductCountException();
+
         if(product.getProductName().isEmpty() || product.getPackagePrice().equals(0) ||
                 product.getNumItemsInPackage() == 0)
             throw new InvalidProductException();
     }
 
     public void removeCategory(String categoryName){
+
         CartItem cartItemToRemove = this.cart.getCartItems().stream()
                 .filter(item -> item.getCategory().equals(categoryName)).findFirst().orElse(null);
+
         if(cartItemToRemove != null) this.cart.removeItem(cartItemToRemove);
     }
-
 }

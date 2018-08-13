@@ -14,7 +14,9 @@ public class Product {
     public Product() {
 
     }
+
     public Product(String productName, BigDecimal packagePrice, int numItemsInPackage) {
+
         this.productName = productName;
         this.packagePrice = packagePrice;
         this.numItemsInPackage = numItemsInPackage;
@@ -36,6 +38,7 @@ public class Product {
     }
 
     public Product(Product product) {
+
         this.productName = new String(product.getProductName());
         this.packagePrice = product.getPackagePrice().add(BigDecimal.ZERO);
         this.numItemsInPackage = product.getNumItemsInPackage();
