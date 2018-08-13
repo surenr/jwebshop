@@ -6,29 +6,24 @@ import driw.xtechnology.assignment.webshop.exceptions.CartEmptyException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductCountException;
 import driw.xtechnology.assignment.webshop.exceptions.InvalidProductException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.*;
 
 @Service
-@SessionScope
 public class CartService {
 
     @Autowired
     private List<IPriceCondition> priceConditionServiceList;
 
-    private Cart cart;
+    @Autowired
+    private DataService dataService;
 
     public CartService() {
-        this.cart = new Cart(new ArrayList<>());
+
     }
 
     public void add(Product product, int count) throws InvalidProductException, InvalidProductCountException {
-
         validateAddProduct(product, count);
 
         CartItem cartItemToAdd = findCartItemByProductName(product);
@@ -42,16 +37,15 @@ public class CartService {
             cartItemToAdd = new CartItem(product, newNumExistingProducts);
         }
 
-        this.cart.addOrUpdate(cartItemToAdd);
+        this.dataService.getCart().addOrUpdate(cartItemToAdd);
     }
 
     public void empty() {
-        this.cart.empty();
+        this.dataService.getCart().empty();
     }
 
     public void remove(Product product, int count) throws CartEmptyException {
-
-        if(this.cart.getCartItems().size() == 0) throw new CartEmptyException();
+        if(this.dataService.getCart().getCartItems().size() == 0) throw new CartEmptyException();
 
         CartItem cartItemToRemove = findCartItemByProductName(product);
 
@@ -63,25 +57,24 @@ public class CartService {
             if (newItemNumberInCategory < 0) newItemNumberInCategory = 0;
 
             if (newItemNumberInCategory == 0) {
-                this.cart.removeItem(cartItemToRemove);
+                this.dataService.getCart().removeItem(cartItemToRemove);
             } else {
                 cartItemToRemove.updateItem(product,newItemNumberInCategory);
-                this.cart.addOrUpdate(cartItemToRemove);
+                this.dataService.getCart().addOrUpdate(cartItemToRemove);
             }
         }
     }
 
     public Cart cart() {
-        return this.cart;
+        return this.dataService.getCart();
     }
 
 
     public List<CartItem> cartItems() {
-        return this.cart.getCartItems();
+        return this.dataService.getCart().getCartItems();
     }
 
     public Cart applyPriceConditions(Cart cart) {
-
         Cart cartWithPriceConditions = new Cart(cart);
 
         for(CartItem item: cartWithPriceConditions.getCartItems()) {
@@ -94,20 +87,17 @@ public class CartService {
     }
 
     public int productCount(Product product) {
-
         CartItem cartItem = findCartItemByProductName(product);
         return cartItem == null ? 0 : cartItem.getNumOfProductsInCategory();
     }
 
 
     private CartItem findCartItemByProductName(Product product) {
-
-        return this.cart.getCartItems().stream()
+        return this.dataService.getCart().getCartItems().stream()
                 .filter(item -> item.getCategory().equals(product.getProductName())).findFirst().orElse(null);
     }
 
     private void validateAddProduct(Product product, int count) throws InvalidProductCountException, InvalidProductException {
-
         if(count == 0) throw new InvalidProductCountException();
 
         if(product.getProductName().isEmpty() || product.getPackagePrice().equals(0) ||
@@ -115,11 +105,11 @@ public class CartService {
             throw new InvalidProductException();
     }
 
-    public void removeCategory(String categoryName){
-
-        CartItem cartItemToRemove = this.cart.getCartItems().stream()
+    public void removeCategory(String categoryName) {
+        CartItem cartItemToRemove = this.dataService.getCart().getCartItems().stream()
                 .filter(item -> item.getCategory().equals(categoryName)).findFirst().orElse(null);
 
-        if(cartItemToRemove != null) this.cart.removeItem(cartItemToRemove);
+        if(cartItemToRemove != null) this.dataService.getCart().removeItem(cartItemToRemove);
     }
+
 }

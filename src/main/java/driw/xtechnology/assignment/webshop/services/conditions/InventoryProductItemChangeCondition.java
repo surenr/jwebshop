@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+/*
+    Apply the 30% charge (when buying individual items) price condition
+*/
+
 @Service
 public class InventoryProductItemChangeCondition implements IPriceCondition {
 
