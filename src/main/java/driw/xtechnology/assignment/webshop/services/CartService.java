@@ -50,7 +50,6 @@ public class CartService {
         CartItem cartItemToRemove = findCartItemByProductName(product);
 
         if(cartItemToRemove != null) {
-
             int numExistingProducts =  cartItemToRemove.getNumOfProductsInCategory();
             int newItemNumberInCategory = numExistingProducts - count;
 
